@@ -1,3 +1,6 @@
+require_relative 'playing_cards/deck.rb'
+require_relative 'hand_result.rb'
+
 # A game of High Card.
 class HighcardGame
   attr_reader :score, :player1_name, :player2_name
@@ -35,99 +38,6 @@ class HighcardGame
 
     @score[:player1] += hand_result.score[:player1]
     @score[:player2] += hand_result.score[:player2]
-  end
-end
-
-# A Deck represents a collection of cards which are used in a game.
-class Deck
-  def initialize
-    @cards = fill_deck.shuffle
-  end
-
-  def draw_without_replacement
-    card, *remaining = @cards
-    @cards = remaining
-    card
-  end
-
-  def cards_remaining
-    @cards.count
-  end
-
-  private
-
-  def fill_deck
-    cards = Card.all_suits.collect do |suit|
-      suit_cards = (1..13).collect do |value|
-        Card.new(value, suit)
-      end
-      suit_cards
-    end
-
-    cards.flatten
-  end
-end
-
-# Represents a simple playing card. Has a suit and a value (e.g., A three of
-# clubs).
-class Card
-  attr_reader :value, :suit
-
-  def initialize(value, suit)
-    raise 'value is not valid.' unless Card.valid_value? value
-    raise 'suit is not valid.' unless Card.valid_suit? suit
-
-    @value = value
-    @suit = suit
-  end
-
-  def to_s
-    format('%d of %s', @value, @suit)
-  end
-
-  def self.all_suits
-    [:hearts, :diamonds, :spades, :clubs]
-  end
-
-  def self.valid_value?(value)
-    value.is_a?(Integer) && value >= 1 && value <= 13
-  end
-
-  def self.valid_suit?(suit)
-    all_suits.include?(suit)
-  end
-end
-
-# The HandResult class represents the resulting draws and scores of a single
-# hand.
-class HandResult
-  attr_reader :score, :card1, :card2
-
-  def initialize(player1_card: nil, player2_card: nil)
-    raise 'player1_card must be a card.' unless player1_card.is_a?(Card)
-    raise 'player2_card must be a card.' unless player2_card.is_a?(Card)
-
-    @card1 = player1_card
-    @card2 = player2_card
-  end
-
-  def score
-    @score ||= {
-      player1: player1_win? ? 1 : 0,
-      player2: player2_win? ? 1 : 0
-    }
-  end
-
-  def tie?
-    @card1.value == @card2.value
-  end
-
-  def player1_win?
-    @card1.value > @card2.value
-  end
-
-  def player2_win?
-    @card2.value > @card1.value
   end
 end
 
